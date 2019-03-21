@@ -18,4 +18,6 @@ public interface UserMapper {
     int checkUserName(String userName);
 
     User selectLogin(@Param("username") String username, @Param("password") String password);
+
+    int checkEmail(String str);
 }

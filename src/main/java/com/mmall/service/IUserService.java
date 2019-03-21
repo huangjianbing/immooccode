@@ -10,4 +10,6 @@ import com.mmall.pojo.User;
  */
 public interface IUserService {
     ServerResponse<User> login(String Username, String password);
+    ServerResponse<String> checkValid(String str,String type);
+    ServerResponse<String> register(User user);
 }
