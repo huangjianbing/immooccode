@@ -1,5 +1,6 @@
 package com.mmall.common;
 
+import com.mmall.pojo.User;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -68,7 +69,11 @@ public class ServerResponse<T> implements Serializable {
     public static <T> ServerResponse<T> createByErrorMsg(String Msg){
         return  new ServerResponse<T>(ResponseCode.ERROR.getCode(),Msg);
     }
-    public static <T> ServerResponse<T> createByErrorMsg(int code ,String msg,T data){
+    public static <T> ServerResponse<T> createByError(int code ,String msg,T data){
         return new ServerResponse<T>(code,msg,data);
+    }
+
+    public static <T>ServerResponse<T> createByErrorCodeMsg(int code, String Msg) {
+        return  new ServerResponse<T>(code,Msg);
     }
 }

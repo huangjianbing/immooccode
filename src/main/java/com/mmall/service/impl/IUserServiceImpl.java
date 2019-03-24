@@ -125,4 +125,48 @@ public class IUserServiceImpl implements IUserService {
         }
         return ServerResponse.createByErrorMsg("重置密码失败");
     }
+
+    @Override
+    public ServerResponse<String> restPassword(String passwordOld, String passwordNew, User user) {
+        int count=userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld),user.getId());
+        if(count==0){
+            return ServerResponse.createByErrorMsg("旧密码错误");
+        }
+        user.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
+        count = userMapper.updateByPrimaryKeySelective(user);
+        if (count>0){
+            return ServerResponse.createBySuccessMsg("重置密码成功");
+        }
+        return ServerResponse.createByErrorMsg("重置密码失败");
+    }
+
+    @Override
+    public ServerResponse<User> updateInformation(User user) {
+        int count=userMapper.checkEmailByUserId(user.getEmail(),user.getId());
+        if(count>0){
+            return ServerResponse.createByErrorMsg("email已存在，请更换email在更新信息");
+        }
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setAnswer(user.getAnswer());
+        updateUser.setEmail(user.getEmail());
+        updateUser.setQuestion(user.getQuestion());
+        updateUser.setPhone(user.getPhone());
+        int rowCount = userMapper.updateByPrimaryKeySelective(updateUser);
+        if(rowCount>0){
+            updateUser.setUsername(user.getUsername());
+            return  ServerResponse.createBySuccess("用户更新成功",updateUser);
+        }
+        return ServerResponse.createByErrorMsg("更新失败");
+    }
+
+    @Override
+    public ServerResponse<User> getInformation(Integer id) {
+        User user=userMapper.selectByPrimaryKey(id);
+        if(user==null){
+            return ServerResponse.createBySuccessMsg("用户不存在");
+        }
+        user.setPassword(StringUtils.EMPTY);
+        return ServerResponse.createBySuccess(user);
+    }
 }

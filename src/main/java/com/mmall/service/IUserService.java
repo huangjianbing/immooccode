@@ -21,4 +21,10 @@ public interface IUserService {
     ServerResponse<String> checkAnswer(String username,String question ,String answer);
 
     ServerResponse<String> restPasswordNew(String username, String passwordNew, String token);
+
+    ServerResponse<String> restPassword(String passwordOld, String passwordNew, User user);
+
+    ServerResponse<User> updateInformation(User current_user);
+
+    ServerResponse<User> getInformation(Integer id);
 }

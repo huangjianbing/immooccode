@@ -1,17 +1,17 @@
 package com.mmall.controller.portal;
 
 import com.mmall.common.Constant;
+import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -22,6 +22,8 @@ import javax.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/user/")
 public class UserController {
+
+    private static Logger logger= LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private IUserService iUserService;
@@ -39,6 +41,7 @@ public class UserController {
         if(response.isSuccess()){
             session.setAttribute(Constant.CURRENT_USER,response.getData());
         }
+        logger.info("成功打印日志");
         return response;
     }
 
@@ -86,5 +89,40 @@ public class UserController {
     @ResponseBody
     public ServerResponse<String> forgetRestPasswordNew(String username,String passwordNew,String token){
         return iUserService.restPasswordNew(username,passwordNew,token);
+    }
+
+    @RequestMapping(value = "restPasswordNew.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String>restPasswordNew(HttpSession session,String passwordOld,String passwordNew){
+        User user = (User) session.getAttribute(Constant.CURRENT_USER);
+        if(user==null){
+            return ServerResponse.createByErrorMsg("用户未登录");
+        }
+        return iUserService.restPassword(passwordOld,passwordNew,user);
+    }
+
+    @RequestMapping(value = "updateInformation.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<User>updateInformation(HttpSession session,User user){
+        User current_user = (User) session.getAttribute(Constant.CURRENT_USER);
+        if(current_user==null){
+            return ServerResponse.createByErrorMsg("用户未登录");
+        }
+        user.setId(current_user.getId());
+        user.setUsername(current_user.getUsername());
+        ServerResponse<User> response=iUserService.updateInformation(user);
+        if(response.isSuccess()){
+            session.setAttribute(Constant.CURRENT_USER,response.getData());
+        }
+        return response;
+    }
+    @RequestMapping(value = "getInformation.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<User> getInformation(HttpSession session){
+        User current_user = (User) session.getAttribute(Constant.CURRENT_USER);
+        if(current_user==null){
+            return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"用户未登录,需要强制登录status");
+        }
+        return iUserService.getInformation(current_user.getId());
     }
 }

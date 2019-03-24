@@ -132,9 +132,9 @@
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+
         update_time =now(),
-      </if>
+
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -182,4 +182,18 @@
     set password=#{passwordNew},update_time=now()
     where username=#{username}
   </update>
+  <select id="checkPassword" resultType="int" parameterType="map">
+    SELECT
+    count(1)
+    FROM
+    mmall_user
+    WHERE
+    password=#{passwordOld} and id=#{id}
+  </select>
+  <select id="checkEmailByUserId" resultType="int" parameterType="map">
+    SELECT
+    count(1)
+    from mmall_user
+    where email=#{email} and id!=#{userId}
+  </select>
 </mapper>
