@@ -4,12 +4,14 @@ import com.mmall.common.Constant;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -39,20 +41,50 @@ public class UserController {
         }
         return response;
     }
+
     @RequestMapping(value = "loginOut.do",method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<String> loginOut(HttpSession session){
         session.removeAttribute(Constant.CURRENT_USER);
         return  ServerResponse.createBySuccess();
     }
+
     @RequestMapping(value = "checkValid.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> checkValid(String str,String type){
         return iUserService.checkValid(str,type);
     }
+
     @RequestMapping(value = "register.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> register(User user){
         return iUserService.register(user);
+    }
+
+    @RequestMapping(value = "getUserInfo.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<User> getUserInfo(HttpSession session){
+        User user= (User) session.getAttribute(Constant.CURRENT_USER);
+        if (null==user){
+            return ServerResponse.createByErrorMsg("用户未登录,无法获取但前用户信息");
+        }
+        return ServerResponse.createBySuccess(user);
+    }
+
+    @RequestMapping(value = "forgetGerQuestion.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> forgetGerQuestion(String username){
+        return iUserService.selectQuestion(username);
+    }
+
+    @RequestMapping(value = "forgetCheckAnswer.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> forgetCheckAnswer(String username ,String question,String answer){
+        return iUserService.checkAnswer(username,question,answer);
+    }
+    @RequestMapping(value = "forgetRestPasswordNew.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> forgetRestPasswordNew(String username,String passwordNew,String token){
+        return iUserService.restPasswordNew(username,passwordNew,token);
     }
 }

@@ -9,7 +9,16 @@ import com.mmall.pojo.User;
  * Description:
  */
 public interface IUserService {
+
     ServerResponse<User> login(String Username, String password);
+
     ServerResponse<String> checkValid(String str,String type);
+
     ServerResponse<String> register(User user);
+
+    ServerResponse<String> selectQuestion(String username);
+
+    ServerResponse<String> checkAnswer(String username,String question ,String answer);
+
+    ServerResponse<String> restPasswordNew(String username, String passwordNew, String token);
 }
