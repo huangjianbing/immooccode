@@ -169,4 +169,12 @@ public class IUserServiceImpl implements IUserService {
         user.setPassword(StringUtils.EMPTY);
         return ServerResponse.createBySuccess(user);
     }
+
+    @Override
+    public ServerResponse<String> checkAdmin(User user) {
+        if(user.getRole()==Constant.Role.ROLE_ADMIN){
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
+    }
 }
