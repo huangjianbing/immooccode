@@ -180,4 +180,17 @@
     FROM mmall_product
     order by id asc
   </select>
+  <select id="selectByProductNameAndProductId" resultMap="BaseResultMap" parameterType="map">
+    SELECT 
+    <include refid="Base_Column_List"/>
+    from mmall_product
+    <where>
+      <if test="productName!=null">
+        and NAME like #{productName}
+      </if>
+      <if test="productId!=null">
+        and id=#{productId}
+      </if>
+    </where>
+  </select>
 </mapper>

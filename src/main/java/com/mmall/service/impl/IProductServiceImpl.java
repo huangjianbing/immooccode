@@ -2,6 +2,7 @@ package com.mmall.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.mmall.common.Constant;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
@@ -88,7 +89,7 @@ public class IProductServiceImpl implements IProductService {
         }
         Product product = productMapper.selectByPrimaryKey(productId);
         if(product==null){
-            ServerResponse.createByErrorMsg("商品已下架或被删除");
+           return ServerResponse.createByErrorMsg("商品已下架或被删除");
         }
         ProductDetailVo productDetailVo=assembleProductDetail(product);
 
@@ -146,5 +147,39 @@ public class IProductServiceImpl implements IProductService {
         productListVo.setName(product.getName());
         productListVo.setSubtitle(product.getSubtitle());
         return productListVo;
+    }
+
+    @Override
+    public ServerResponse productSearch(String productName, Integer productId, Integer pageNum, Integer pageSize) {
+         PageHelper.startPage(pageNum,pageSize);
+         if(StringUtils.isNotBlank(productName)) {
+             productName = new StringBuilder().append("%").append(productName).append("%").toString();
+         }
+        ArrayList<ProductListVo> productListVoList = new ArrayList<>();
+         List<Product> productList=productMapper.selectByProductNameAndProductId(productName,productId);
+         for (Product productItem:productList){
+             ProductListVo productListVo = assembleProductList(productItem);
+             productListVoList.add(productListVo);
+         }
+         PageInfo pageInfo=new PageInfo(productList);
+        pageInfo.setList(productListVoList);
+        return ServerResponse.createBySuccess(pageInfo);
+    }
+
+    public ServerResponse portalProductDetail(Integer productId){
+
+        if(productId==null ){
+            return ServerResponse.createByErrorCodeMsg(ResponseCode.ILLEGA_ARGUMENT.getCode(),ResponseCode.ILLEGA_ARGUMENT.getDesc());
+        }
+        Product product = productMapper.selectByPrimaryKey(productId);
+        if(product==null){
+            return ServerResponse.createByErrorMsg("商品已下架或被删除");
+        }
+        if(product.getStatus()!= Constant.ProductSaleStatus.ON_SALE.getCode()){
+            return ServerResponse.createByErrorMsg("商品已下架");
+        }
+        ProductDetailVo productDetailVo=assembleProductDetail(product);
+
+        return ServerResponse.createBySuccess(productDetailVo);
     }
 }
