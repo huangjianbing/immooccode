@@ -21,4 +21,6 @@ public interface IProductService {
     ServerResponse productSearch(String productName, Integer productId, Integer pageNum, Integer pageSize);
 
     ServerResponse portalProductDetail(Integer productId);
+
+    ServerResponse portalProductSearch(String keyWord,Integer categoryId,String orderBy,Integer pageNum,Integer pageSize );
 }

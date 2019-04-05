@@ -1,5 +1,9 @@
 package com.mmall.common;
 
+import com.google.common.collect.Sets;
+
+import java.util.Set;
+
 /**
  * Author:huangjb
  * Date:2019/3/18
@@ -13,6 +17,19 @@ public class Constant {
     public interface Role{
         int ROLE_CUSTOM=0;
         int ROLE_ADMIN=1;
+    }
+    public interface ProductListOrderBy{
+        Set<String > PRICE_ASC_DESC= Sets.newHashSet("pricr_desc","price_asc");
+    }
+    public interface Cart{
+        //被勾选
+       Integer checked=1;
+
+       Integer unChecked=0;
+
+       String LIMT_NUM_SUCESS="LIMT_NUM_SUCESS";
+
+        String LIMT_NUM_FAIL="LIMT_NUM_FAIL";
     }
     public enum  ProductSaleStatus{
         ON_SALE(1,"商品在售");

@@ -2,6 +2,7 @@ package com.mmall.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.mmall.common.Constant;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
@@ -9,6 +10,7 @@ import com.mmall.dao.CategoryMapper;
 import com.mmall.dao.ProductMapper;
 import com.mmall.pojo.Category;
 import com.mmall.pojo.Product;
+import com.mmall.service.ICategoryService;
 import com.mmall.service.IProductService;
 import com.mmall.util.DateTimeUtil;
 import com.mmall.util.PropertiesUtil;
@@ -32,6 +34,8 @@ public class IProductServiceImpl implements IProductService {
     private ProductMapper productMapper;
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private ICategoryService iCategoryService;
     @Override
     public ServerResponse saveOrUpdateProduct(Product product) {
         if(product!=null){
@@ -166,6 +170,7 @@ public class IProductServiceImpl implements IProductService {
         return ServerResponse.createBySuccess(pageInfo);
     }
 
+    @Override
     public ServerResponse portalProductDetail(Integer productId){
 
         if(productId==null ){
@@ -181,5 +186,30 @@ public class IProductServiceImpl implements IProductService {
         ProductDetailVo productDetailVo=assembleProductDetail(product);
 
         return ServerResponse.createBySuccess(productDetailVo);
+    }
+
+    public ServerResponse portalProductSearch(String keyWord,Integer categoryId,String orderBy,Integer pageNum,Integer pageSize ){
+        if(StringUtils.isNotBlank(keyWord)){
+            StringBuilder sb=new StringBuilder();
+            keyWord=sb.append("%").append(keyWord).append("%").toString();
+        }
+        List<Integer> categoryIdList = Lists.newArrayList();
+        if(categoryId!=null){
+            categoryIdList=iCategoryService.selectCategoryAndChildernById(categoryId).getData();
+        }
+        PageHelper.startPage(pageNum,pageSize);
+        if(Constant.ProductListOrderBy.PRICE_ASC_DESC.contains(orderBy)){
+            String[] split = orderBy.split("_");
+            PageHelper.orderBy(split[0]+" "+split[1]);
+        }
+        List<Product> productList = productMapper.selectByNameAndKeyWord(StringUtils.isBlank(keyWord)?null:keyWord, categoryIdList.size() == 0 ? null:categoryIdList);
+        List<ProductListVo> productListVos=Lists.newArrayList();
+        for(Product product:productList){
+            ProductListVo productListVo = assembleProductList(product);
+            productListVos.add(productListVo);
+        }
+        PageInfo pageInfo=new PageInfo(productList);
+        pageInfo.setList(productListVos);
+        return ServerResponse.createBySuccess(pageInfo);
     }
 }
