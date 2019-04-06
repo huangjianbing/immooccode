@@ -78,7 +78,7 @@ public class UserController {
         }
         User user= (User) session.getAttribute(sessionName);
         if (null==user){
-            return ServerResponse.createByErrorMsg("登录过期,无法获取但前用户信息");
+            return ServerResponse.createByErrorMsg("登录过期,无法获取当前用户信息");
         }
         return ServerResponse.createBySuccess(user);
     }
@@ -109,7 +109,7 @@ public class UserController {
         }
         User user = (User) session.getAttribute(sessionName);
         if(user==null){
-            return ServerResponse.createByErrorMsg("\"登录过期,无法获取但前用户信息\"");
+            return ServerResponse.createByErrorMsg("登录过期,无法获取当前用户信息");
         }
         return iUserService.restPassword(passwordOld,passwordNew,user);
     }
